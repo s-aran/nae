@@ -9,7 +9,7 @@ impl NaturalSort {
     println!("a: {} ({}), b: {} ({})", a, a.len(), b, b.len());
 
     if a == b {
-      return Ordering::Equal;
+      // return Ordering::Equal;
     }
 
     let a_len = a.len();
@@ -37,41 +37,49 @@ impl NaturalSort {
         '\0'
       };
 
-      println!("a[{}]: {}", i, ac);
-      println!("b[{}]: {}", i, bc);
+      println!("a[{}]: {} (0x{:04X})", i, ac, ac as u32);
+      println!("b[{}]: {} (0x{:04X})", i, bc, bc as u32);
 
       if ac != bc {
-        ret = if ac > bc {
+        ret = if ac < bc {
           Ordering::Less
         } else {
           Ordering::Greater
         };
-      };
 
-      if ac.is_digit(Radix) && bc.is_digit(Radix) {
-        let mut anum = "";
-        let mut bnum = "";
+        println!("a: {}, b: {}", ac.is_digit(Radix), bc.is_digit(Radix));
+        if ac.is_digit(Radix) && bc.is_digit(Radix) {
+          let mut anum = "";
+          let mut bnum = "";
 
-        for ai in i..(max_len) {
-          println!("ai: {} -> {}", ai, a.chars().nth(ai).unwrap());
-          if !a.chars().nth(ai).unwrap().is_digit(Radix) {
-            anum = &a[i..ai];
-            break;
+          for ai in i..(max_len) {
+            println!("ai: {} -> {}", ai, a.chars().nth(ai).unwrap());
+            if !a.chars().nth(ai).unwrap().is_digit(Radix) {
+              anum = &a[i..ai];
+              break;
+            }
           }
-        }
 
-        for bi in i..(max_len) {
-          if !b.chars().nth(bi).unwrap().is_digit(Radix) {
-            bnum = &b[i..bi];
-            break;
+          for bi in i..(max_len) {
+            if !b.chars().nth(bi).unwrap().is_digit(Radix) {
+              bnum = &b[i..bi];
+              break;
+            }
           }
-        }
 
-        println!("anum: {}", anum);
-        println!("bnum: {}", bnum);
+          println!("anum: {}", anum);
+          println!("bnum: {}", bnum);
+        } else {
+          break;
+        }
       }
     }
 
+    println!("ret: {}", match ret {
+      Ordering::Less => "Less",
+      Ordering::Greater => "Greater",
+      Ordering::Equal => "Equal",
+    });
     ret
   }
 }
