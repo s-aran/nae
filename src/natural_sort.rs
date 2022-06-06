@@ -1,29 +1,24 @@
-const Radix: u32 = 10;
+use std::cmp::Ordering;
 
-#[derive(Hash, Eq, PartialEq, Debug)]
-pub enum CompareResult {
-  Equal = 0,
-  Greater = 1,
-  Less = -1,
-}
+const Radix: u32 = 10;
 
 pub struct NaturalSort;
 
 impl NaturalSort {
-  pub fn strcmp_natural(a: &str, b: &str) -> CompareResult {
+  pub fn strcmp_natural(a: &str, b: &str) -> Ordering {
     println!("a: {} ({}), b: {} ({})", a, a.len(), b, b.len());
 
     if a == b {
-      return CompareResult::Equal;
+      return Ordering::Equal;
     }
 
     let a_len = a.len();
     let b_len = b.len();
 
-    let max_len = std::cmp::max(a.len(), b.len()) - 1;
+    let max_len = std::cmp::max(a.len(), b.len());
     println!("max_len: {}", max_len);
 
-    let mut ret = CompareResult::Equal;
+    let mut ret = Ordering::Equal;
 
     for i in 0..max_len {
       let a_char = a.chars().nth(i).unwrap();
@@ -47,9 +42,9 @@ impl NaturalSort {
 
       if ac != bc {
         ret = if ac > bc {
-          CompareResult::Less
+          Ordering::Less
         } else {
-          CompareResult::Greater
+          Ordering::Greater
         };
       };
 
@@ -57,7 +52,7 @@ impl NaturalSort {
         let mut anum = "";
         let mut bnum = "";
 
-        for ai in i..(max_len ) {
+        for ai in i..(max_len) {
           println!("ai: {} -> {}", ai, a.chars().nth(ai).unwrap());
           if !a.chars().nth(ai).unwrap().is_digit(Radix) {
             anum = &a[i..ai];
@@ -65,7 +60,7 @@ impl NaturalSort {
           }
         }
 
-        for bi in i..(max_len ) {
+        for bi in i..(max_len) {
           if !b.chars().nth(bi).unwrap().is_digit(Radix) {
             bnum = &b[i..bi];
             break;
@@ -83,8 +78,8 @@ impl NaturalSort {
 
 #[cfg(test)]
 mod tests {
-  use crate::natural_sort::CompareResult;
   use crate::natural_sort::NaturalSort;
+  use std::cmp::Ordering;
 
   #[test]
   fn test_strcmp_natural_equal() {
@@ -92,7 +87,16 @@ mod tests {
     let b = "a100";
 
     let result = NaturalSort::strcmp_natural(a, b);
-    assert!(result == CompareResult::Equal);
+    assert!(result == Ordering::Equal);
+  }
+
+  #[test]
+  fn test_strcmp_natural_equal_alpha() {
+    let a = "aaa";
+    let b = "aaa";
+
+    let result = NaturalSort::strcmp_natural(a, b);
+    assert!(result == Ordering::Equal);
   }
 
   #[test]
@@ -101,7 +105,7 @@ mod tests {
     let b = "a10";
 
     let result = NaturalSort::strcmp_natural(a, b);
-    assert!(result == CompareResult::Greater);
+    assert!(result == Ordering::Greater);
   }
 
   #[test]
@@ -110,24 +114,44 @@ mod tests {
     let b = "a100";
 
     let result = NaturalSort::strcmp_natural(a, b);
-    assert!(result == CompareResult::Less);
+    assert!(result == Ordering::Less);
   }
 
   #[test]
   fn test_strcmp_natural_greater_alpha() {
-    let a = "aba";
-    let b = "aaa";
+    {
+      let a = "aba";
+      let b = "aaa";
 
-    let result = a.cmp(b);
-    assert!(result == std::cmp::Ordering::Greater);
+      let result = NaturalSort::strcmp_natural(a, b);
+      assert!(result == Ordering::Greater);
+    }
+
+    {
+      let a = "aab";
+      let b = "aaa";
+
+      let result = NaturalSort::strcmp_natural(a, b);
+      assert!(result == Ordering::Greater);
+    }
   }
 
   #[test]
   fn test_strcmp_natural_less_alpha() {
-    let a = "aaa";
-    let b = "aba";
+    {
+      let a = "aaa";
+      let b = "aba";
 
-    let result = a.cmp(b);
-    assert!(result == std::cmp::Ordering::Less);
+      let result = NaturalSort::strcmp_natural(a, b);
+      assert!(result == Ordering::Less);
+    }
+
+    {
+      let a = "aaa";
+      let b = "aab";
+
+      let result = NaturalSort::strcmp_natural(a, b);
+      assert!(result == Ordering::Less);
+    }
   }
 }
