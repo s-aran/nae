@@ -118,40 +118,56 @@ mod tests {
   }
 
   #[test]
-  fn test_strcmp_natural_greater_alpha() {
-    {
-      let a = "aba";
-      let b = "aaa";
+  fn test_strcmp_natural_greater_alpha_1() {
+    let a = "baa";
+    let b = "aaa";
 
-      let result = NaturalSort::strcmp_natural(a, b);
-      assert!(result == Ordering::Greater);
-    }
-
-    {
-      let a = "aab";
-      let b = "aaa";
-
-      let result = NaturalSort::strcmp_natural(a, b);
-      assert!(result == Ordering::Greater);
-    }
+    let result = NaturalSort::strcmp_natural(a, b);
+    assert!(result == Ordering::Greater);
   }
 
   #[test]
-  fn test_strcmp_natural_less_alpha() {
-    {
-      let a = "aaa";
-      let b = "aba";
+  fn test_strcmp_natural_greater_alpha_2() {
+    let a = "aba";
+    let b = "aaa";
 
-      let result = NaturalSort::strcmp_natural(a, b);
-      assert!(result == Ordering::Less);
-    }
+    let result = NaturalSort::strcmp_natural(a, b);
+    assert!(result == Ordering::Greater);
+  }
 
-    {
-      let a = "aaa";
-      let b = "aab";
+  #[test]
+  fn test_strcmp_natural_greater_alpha_3() {
+    let a = "aab";
+    let b = "aaa";
 
-      let result = NaturalSort::strcmp_natural(a, b);
-      assert!(result == Ordering::Less);
-    }
+    let result = NaturalSort::strcmp_natural(a, b);
+    assert!(result == Ordering::Greater);
+  }
+
+  #[test]
+  fn test_strcmp_natural_less_alpha_1() {
+    let a = "aaa";
+    let b = "baa";
+
+    let result = NaturalSort::strcmp_natural(a, b);
+    assert!(result == Ordering::Less);
+  }
+
+  #[test]
+  fn test_strcmp_natural_less_alpha_2() {
+    let a = "aaa";
+    let b = "aba";
+
+    let result = NaturalSort::strcmp_natural(a, b);
+    assert!(result == Ordering::Less);
+  }
+
+  #[test]
+  fn test_strcmp_natural_less_alpha_3() {
+    let a = "aaa";
+    let b = "aab";
+
+    let result = NaturalSort::strcmp_natural(a, b);
+    assert!(result == Ordering::Less);
   }
 }
