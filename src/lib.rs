@@ -1,1 +1,1 @@
-mod natural_sort;
+pub mod natural_sort;
