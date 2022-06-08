@@ -59,28 +59,49 @@ impl NaturalSort {
 
         // println!("a: {}, b: {}", ac.is_digit(Radix), bc.is_digit(Radix));
         if ac.is_digit(NaturalSort::RADIX) && bc.is_digit(NaturalSort::RADIX) {
-          let mut anum = "";
-          let mut bnum = "";
-
-          for ai in i..a_len - 1 {
+          let mut ai = i;
+          for _ in i..a_len {
             // println!("ai: {} -> {}", ai, a.chars().nth(ai).unwrap());
             if !a.chars().nth(ai).unwrap().is_digit(NaturalSort::RADIX) {
-              anum = &a[i..ai];
               break;
             }
+            ai += 1;
           }
 
-          for bi in i..b_len - 1 {
+          // println!("{}[{}..{}] --> {}", a, i, ai, &a[i..ai]);
+          let asl = &a[i..ai];
+          let anum = if asl == "" {
+            0
+          } else {
+            asl.parse::<u32>().unwrap()
+          };
+
+          let mut bi = i;
+          for _ in i..b_len {
+            // println!("bi: {} -> {}", bi, b.chars().nth(bi).unwrap());
             if !b.chars().nth(bi).unwrap().is_digit(NaturalSort::RADIX) {
-              bnum = &b[i..bi];
               break;
             }
+            bi += 1;
           }
 
-          println!("anum: {}", anum);
-          println!("bnum: {}", bnum);
+          // println!("{}[{}..{}] --> {}", b, i, bi, &b[i..bi]);
+          let bsl = &b[i..bi];
+          let bnum = if bsl == "" {
+            0
+          } else {
+            bsl.parse::<u32>().unwrap()
+          };
 
-          // i += std::cmp::min(anum.len(), bnum.len());
+          // println!("anum: {}", anum);
+          // println!("bnum: {}", bnum);
+
+          ret = if anum < bnum {
+            Ordering::Less
+          } else {
+            Ordering::Greater
+          };
+          break;
         } else if ret == Ordering::Equal {
           continue;
         } else {
@@ -99,12 +120,36 @@ impl NaturalSort {
     // );
     ret
   }
+
+  pub fn natural_sort(v: &mut Vec<&str>) {
+    v.sort_unstable_by(|a, b| NaturalSort::strcmp_natural(&a, &b));
+  }
 }
 
 #[cfg(test)]
 mod tests {
   use crate::natural_sort::NaturalSort;
   use std::cmp::Ordering;
+
+  #[test]
+  fn test_natural_sort_1() {
+    let mut vec = vec!["10", "9", "8", "7", "5", "1", "2", "3", "4", "6"];
+    let expected = vec!["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
+    NaturalSort::natural_sort(&mut vec);
+    assert_eq!(vec, expected);
+  }
+
+  #[test]
+  fn test_natural_sort_2() {
+    let mut vec = vec![
+      "a100a", "a100", "a", "a10", "a2", "a200", "a20", "a1", "a100a10", "a100a1",
+    ];
+    let expected = vec![
+      "a", "a1", "a2", "a10", "a20", "a100", "a100a", "a100a1", "a100a10", "a200",
+    ];
+    NaturalSort::natural_sort(&mut vec);
+    assert_eq!(vec, expected);
+  }
 
   #[test]
   fn test_strcmp_natural() {
@@ -159,6 +204,15 @@ mod tests {
   }
 
   #[test]
+  fn test_strcmp_natural_greater_4() {
+    let a = "a200";
+    let b = "a100a";
+
+    let result = NaturalSort::strcmp_natural(a, b);
+    assert!(result == Ordering::Greater);
+  }
+
+  #[test]
   fn test_strcmp_natural_less_1() {
     let a = "a10";
     let b = "a100";
@@ -180,6 +234,15 @@ mod tests {
   fn test_strcmp_natural_less_3() {
     let a = "a10a100";
     let b = "a10b10";
+
+    let result = NaturalSort::strcmp_natural(a, b);
+    assert!(result == Ordering::Less);
+  }
+
+  #[test]
+  fn test_strcmp_natural_less_4() {
+    let a = "a100a";
+    let b = "a200";
 
     let result = NaturalSort::strcmp_natural(a, b);
     assert!(result == Ordering::Less);
