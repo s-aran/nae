@@ -112,7 +112,16 @@ mod tests {
   }
 
   #[test]
-  fn test_parse_with_incremental() {
+  fn test_parse_with_incremental_1() {
+    let p = Parser::new();
+
+    let name = "test?";
+    let r = p.parse(name);
+
+    assert_eq!(String::from("test1"), r.unwrap());
+  }
+  #[test]
+  fn test_parse_with_incremental_2() {
     let p = Parser::new();
 
     let name = "test???";
