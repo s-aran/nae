@@ -207,6 +207,17 @@ mod tests {
   }
 
   #[test]
+  fn test_parse_with_incremental_7() {
+    let mut p = Parser::new();
+    let name = "?";
+
+    for i in 1..1000 + 1 {
+      let r = p.parse(name);
+      assert_eq!(format!("{}", i), r.unwrap());
+    }
+  }
+
+  #[test]
   fn test_parse_with_datetime_4year_1() {
     let mut p = Parser::new();
 
@@ -229,7 +240,6 @@ mod tests {
 
     assert_eq!(now.format("test%y").to_string(), r.unwrap());
   }
-
 
   #[test]
   fn test_parse_with_datetime_month_1() {
@@ -278,7 +288,7 @@ mod tests {
 
     assert_eq!(now.format("test%Y").to_string(), r.unwrap());
   }
-  
+
   #[test]
   fn test_parse_with_datetime_second_1() {
     let mut p = Parser::new();
@@ -300,6 +310,9 @@ mod tests {
 
     let now = Local::now();
 
-    assert_eq!(now.format("test%y - %Y-%m-%d_%H-%M-%S").to_string(), r.unwrap());
+    assert_eq!(
+      now.format("test%y - %Y-%m-%d_%H-%M-%S").to_string(),
+      r.unwrap()
+    );
   }
 }
