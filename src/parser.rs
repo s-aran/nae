@@ -34,8 +34,10 @@ impl Parser {
       // println!("{}: {}", i, c);
 
       if c == '\\' {
-        backslash_flag = true;
-        continue;
+        if !backslash_flag {
+          backslash_flag = true;
+          continue;
+        }
       }
 
       if c == '?' {
@@ -57,6 +59,7 @@ impl Parser {
         let datetime = Local::now();
 
         match c {
+          '\\' => ret.push('\\'),
           'Y' => {
             // Year (four digit)
             let s = datetime.format("%Y").to_string();
@@ -311,6 +314,26 @@ mod tests {
   }
 
   #[test]
+  fn test_parse_with_backslash_escape_1() {
+    let mut p = Parser::new();
+
+    let name = "test\\\\";
+    let r = p.parse(name);
+
+    assert_eq!(String::from("test\\"), r.unwrap());
+  }
+
+  #[test]
+  fn test_parse_with_backslash_escape_2() {
+    let mut p = Parser::new();
+
+    let name = "test\\\\test";
+    let r = p.parse(name);
+
+    assert_eq!(String::from("test\\test"), r.unwrap());
+  }
+
+  #[test]
   fn test_parse_invalid_1() {
     let mut p = Parser::new();
 
@@ -360,7 +383,7 @@ mod tests {
       r.unwrap_err()
     )
   }
-  
+
   #[test]
   fn test_parse_invalid_4() {
     let mut p = Parser::new();
