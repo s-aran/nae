@@ -64,22 +64,39 @@ impl Parser {
 
         match c {
           'Y' => {
-            // Year
+            // Year (four digit)
+            let s = datetime.format("%Y").to_string();
+            ret.extend(s.chars());
+          }
+          'y' => {
+            // Year (two digit)
+            let s = datetime.format("%y").to_string();
+            ret.extend(s.chars());
           }
           'm' => {
             // Month
+            let s = datetime.format("%m").to_string();
+            ret.extend(s.chars());
           }
           'd' => {
             // Day
+            let s = datetime.format("%d").to_string();
+            ret.extend(s.chars());
           }
           'H' => {
             // Hour
+            let s = datetime.format("%H").to_string();
+            ret.extend(s.chars());
           }
           'M' => {
             // Minute
+            let s = datetime.format("%M").to_string();
+            ret.extend(s.chars());
           }
           'S' => {
             // Second
+            let s = datetime.format("%S").to_string();
+            ret.extend(s.chars());
           }
           _ => {
             return Err(Error {
@@ -89,6 +106,7 @@ impl Parser {
             });
           }
         }
+
         continue;
       } else {
         ret.push(c);
@@ -108,6 +126,8 @@ impl Parser {
 
 #[cfg(test)]
 mod tests {
+  use chrono::Local;
+
   use crate::parser::Parser;
 
   #[test]
@@ -184,5 +204,102 @@ mod tests {
       let r = p.parse(name);
       assert_eq!(String::from("002"), r.unwrap());
     }
+  }
+
+  #[test]
+  fn test_parse_with_datetime_4year_1() {
+    let mut p = Parser::new();
+
+    let name = "test\\Y";
+    let r = p.parse(name);
+
+    let now = Local::now();
+
+    assert_eq!(now.format("test%Y").to_string(), r.unwrap());
+  }
+
+  #[test]
+  fn test_parse_with_datetime_2year_1() {
+    let mut p = Parser::new();
+
+    let name = "test\\y";
+    let r = p.parse(name);
+
+    let now = Local::now();
+
+    assert_eq!(now.format("test%y").to_string(), r.unwrap());
+  }
+
+
+  #[test]
+  fn test_parse_with_datetime_month_1() {
+    let mut p = Parser::new();
+
+    let name = "test\\m";
+    let r = p.parse(name);
+
+    let now = Local::now();
+
+    assert_eq!(now.format("test%m").to_string(), r.unwrap());
+  }
+
+  #[test]
+  fn test_parse_with_datetime_day_1() {
+    let mut p = Parser::new();
+
+    let name = "test\\d";
+    let r = p.parse(name);
+
+    let now = Local::now();
+
+    assert_eq!(now.format("test%d").to_string(), r.unwrap());
+  }
+
+  #[test]
+  fn test_parse_with_datetime_hour_1() {
+    let mut p = Parser::new();
+
+    let name = "test\\H";
+    let r = p.parse(name);
+
+    let now = Local::now();
+
+    assert_eq!(now.format("test%H").to_string(), r.unwrap());
+  }
+
+  #[test]
+  fn test_parse_with_datetime_minute_1() {
+    let mut p = Parser::new();
+
+    let name = "test\\Y";
+    let r = p.parse(name);
+
+    let now = Local::now();
+
+    assert_eq!(now.format("test%Y").to_string(), r.unwrap());
+  }
+  
+  #[test]
+  fn test_parse_with_datetime_second_1() {
+    let mut p = Parser::new();
+
+    let name = "test\\S";
+    let r = p.parse(name);
+
+    let now = Local::now();
+
+    assert_eq!(now.format("test%S").to_string(), r.unwrap());
+  }
+
+  #[test]
+  fn test_parse_with_datetime_full_1() {
+    let mut p = Parser::new();
+
+    let name = "test\\y - \\Y-\\m-\\d_\\H-\\M-\\S";
+    let r = p.parse(name);
+
+    let now = Local::now();
+
+    assert_eq!(now.format("test%y - %Y-%m-%d_%H-%M-%S").to_string(), r.unwrap());
   }
 }
