@@ -3,7 +3,6 @@
 use rustop::opts;
 use std::path;
 
-mod natural_sort;
 
 
 fn main() {
