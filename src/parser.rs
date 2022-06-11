@@ -20,13 +20,15 @@ pub struct Error {
 
 impl Parser {
   pub fn new() -> Self {
-    Parser { counter: 1 }
+    Parser { counter: 0 }
   }
 
-  pub fn parse(self, name: &str) -> Result<String, Error> {
+  pub fn parse(&mut self, name: &str) -> Result<String, Error> {
     let mut question_count = 0;
     let mut begin_pos = 0;
     let mut backslash_flag = false;
+
+    self.counter += 1;
 
     let mut ret: Vec<char> = vec![];
     for (i, c) in name.chars().enumerate() {
@@ -110,7 +112,7 @@ mod tests {
 
   #[test]
   fn test_parse() {
-    let p = Parser::new();
+    let mut p = Parser::new();
 
     let name = "test";
     let r = p.parse(name);
@@ -120,7 +122,7 @@ mod tests {
 
   #[test]
   fn test_parse_with_incremental_1() {
-    let p = Parser::new();
+    let mut p = Parser::new();
 
     let name = "test?";
     let r = p.parse(name);
@@ -130,7 +132,7 @@ mod tests {
 
   #[test]
   fn test_parse_with_incremental_2() {
-    let p = Parser::new();
+    let mut p = Parser::new();
 
     let name = "test???";
     let r = p.parse(name);
@@ -140,11 +142,47 @@ mod tests {
 
   #[test]
   fn test_parse_with_incremental_3() {
-    let p = Parser::new();
+    let mut p = Parser::new();
 
     let name = "test???123";
     let r = p.parse(name);
 
     assert_eq!(String::from("test001123"), r.unwrap());
+  }
+
+  #[test]
+  fn test_parse_with_incremental_4() {
+    let mut p = Parser::new();
+
+    let name = "???test";
+    let r = p.parse(name);
+
+    assert_eq!(String::from("001test"), r.unwrap());
+  }
+
+  #[test]
+  fn test_parse_with_incremental_5() {
+    let mut p = Parser::new();
+
+    let name = "???";
+    let r = p.parse(name);
+
+    assert_eq!(String::from("001"), r.unwrap());
+  }
+
+  #[test]
+  fn test_parse_with_incremental_6() {
+    let mut p = Parser::new();
+    let name = "???";
+
+    {
+      let r = p.parse(name);
+      assert_eq!(String::from("001"), r.unwrap());
+    }
+
+    {
+      let r = p.parse(name);
+      assert_eq!(String::from("002"), r.unwrap());
+    }
   }
 }
