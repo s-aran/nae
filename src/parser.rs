@@ -75,6 +75,16 @@ impl Parser {
             let s = datetime.format("%m").to_string();
             ret.extend(s.chars());
           }
+          'b' => {
+            // Month name (abbreviated)
+            let s = datetime.format("%b").to_string();
+            ret.extend(s.chars());
+          }
+          'B' => {
+            // Month name (full)
+            let s = datetime.format("%B").to_string();
+            ret.extend(s.chars());
+          }
           'd' => {
             // Day
             let s = datetime.format("%d").to_string();
@@ -84,7 +94,7 @@ impl Parser {
             // Weekday name (abbreviated)
             let s = datetime.format("%a").to_string();
             ret.extend(s.chars());
-          } 
+          }
           'A' => {
             // Weekday name (full)
             let s = datetime.format("%A").to_string();
@@ -276,6 +286,30 @@ mod tests {
   }
 
   #[test]
+  fn test_parse_with_datetime_month_name_abbreviated_1() {
+    let mut p = Parser::new();
+
+    let name = "test\\b";
+    let r = p.parse(name);
+
+    let now = Local::now();
+
+    assert_eq!(now.format("test%b").to_string(), r.unwrap());
+  }
+
+  #[test]
+  fn test_parse_with_datetime_month_name_full_1() {
+    let mut p = Parser::new();
+
+    let name = "test\\B";
+    let r = p.parse(name);
+
+    let now = Local::now();
+
+    assert_eq!(now.format("test%B").to_string(), r.unwrap());
+  }
+
+  #[test]
   fn test_parse_with_datetime_day_1() {
     let mut p = Parser::new();
 
@@ -300,8 +334,7 @@ mod tests {
   }
 
   #[test]
-  fn test_parse_with_datetime_weekday_name_full_1()
-  {
+  fn test_parse_with_datetime_weekday_name_full_1() {
     let mut p = Parser::new();
 
     let name = "test\\A";
