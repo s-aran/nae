@@ -80,6 +80,16 @@ impl Parser {
             let s = datetime.format("%d").to_string();
             ret.extend(s.chars());
           }
+          'a' => {
+            // Weekday name (abbreviated)
+            let s = datetime.format("%a").to_string();
+            ret.extend(s.chars());
+          } 
+          'A' => {
+            // Weekday name (full)
+            let s = datetime.format("%A").to_string();
+            ret.extend(s.chars());
+          }
           'p' => {
             // am/pm (12-hour clock)
             let s = datetime.format("%p").to_string();
@@ -275,6 +285,31 @@ mod tests {
     let now = Local::now();
 
     assert_eq!(now.format("test%d").to_string(), r.unwrap());
+  }
+
+  #[test]
+  fn test_parse_with_datetime_weekday_name_abbreviated_1() {
+    let mut p = Parser::new();
+
+    let name = "test\\a";
+    let r = p.parse(name);
+
+    let now = Local::now();
+
+    assert_eq!(now.format("test%a").to_string(), r.unwrap());
+  }
+
+  #[test]
+  fn test_parse_with_datetime_weekday_name_full_1()
+  {
+    let mut p = Parser::new();
+
+    let name = "test\\A";
+    let r = p.parse(name);
+
+    let now = Local::now();
+
+    assert_eq!(now.format("test%A").to_string(), r.unwrap());
   }
 
   #[test]
