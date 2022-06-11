@@ -25,7 +25,6 @@ impl Parser {
 
   pub fn parse(&mut self, name: &str) -> Result<String, Error> {
     let mut question_count = 0;
-    let mut begin_pos = 0;
     let mut backslash_flag = false;
 
     self.counter += 1;
@@ -36,15 +35,10 @@ impl Parser {
 
       if c == '\\' {
         backslash_flag = true;
-        begin_pos = i;
         continue;
       }
 
       if c == '?' {
-        if question_count <= 0 {
-          begin_pos = i;
-        }
-
         question_count += 1;
         continue;
       } else {
