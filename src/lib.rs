@@ -1,2 +1,3 @@
 pub mod natural_sort;
-mod parser;
+pub mod parser;
+pub mod fullwidth;
