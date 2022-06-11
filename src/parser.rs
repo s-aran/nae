@@ -25,7 +25,7 @@ impl Parser {
 
   pub fn parse(self, name: &str) -> Result<String, Error> {
     let mut question_count = 0;
-    let mut question_position = 0;
+    let mut begin_pos = 0;
     let mut backslash_flag = false;
 
     let mut ret: Vec<char> = vec![];
@@ -34,24 +34,31 @@ impl Parser {
 
       if c == '\\' {
         backslash_flag = true;
+        begin_pos = i;
         continue;
       }
 
       if c == '?' {
         if question_count <= 0 {
-          question_position = i;
+          begin_pos = i;
         }
+
         question_count += 1;
         continue;
       } else {
         if question_count > 0 {
           println!("{:01$}", self.counter, question_count);
+          let s = format!("{:01$}", self.counter, question_count);
+          ret.extend(s.chars());
         }
+
         question_count = 0;
       }
 
       if backslash_flag {
         backslash_flag = false;
+
+        let datetime = Local::now();
 
         match c {
           'Y' => {
@@ -88,7 +95,7 @@ impl Parser {
 
     if question_count > 0 {
       let s = format!("{:01$}", self.counter, question_count);
-      ret.extend_from_slice(s.chars().collect::<Vec<_>>().as_slice());
+      ret.extend(s.chars());
     }
 
     println!("ret: {}", ret.iter().collect::<String>());
@@ -120,6 +127,7 @@ mod tests {
 
     assert_eq!(String::from("test1"), r.unwrap());
   }
+
   #[test]
   fn test_parse_with_incremental_2() {
     let p = Parser::new();
@@ -128,5 +136,15 @@ mod tests {
     let r = p.parse(name);
 
     assert_eq!(String::from("test001"), r.unwrap());
+  }
+
+  #[test]
+  fn test_parse_with_incremental_3() {
+    let p = Parser::new();
+
+    let name = "test???123";
+    let r = p.parse(name);
+
+    assert_eq!(String::from("test001123"), r.unwrap());
   }
 }
