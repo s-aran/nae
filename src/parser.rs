@@ -32,7 +32,7 @@ impl Parser {
 
     let mut ret: Vec<char> = vec![];
     for (i, c) in name.chars().enumerate() {
-      println!("{}: {}", i, c);
+      // println!("{}: {}", i, c);
 
       if c == '\\' {
         backslash_flag = true;
@@ -49,7 +49,7 @@ impl Parser {
         continue;
       } else {
         if question_count > 0 {
-          println!("{:01$}", self.counter, question_count);
+          // println!("{:01$}", self.counter, question_count);
           let s = format!("{:01$}", self.counter, question_count);
           ret.extend(s.chars());
         }
@@ -118,7 +118,7 @@ impl Parser {
       ret.extend(s.chars());
     }
 
-    println!("ret: {}", ret.iter().collect::<String>());
+    // println!("ret: {}", ret.iter().collect::<String>());
 
     Ok(ret.iter().collect::<String>())
   }
@@ -128,7 +128,7 @@ impl Parser {
 mod tests {
   use chrono::Local;
 
-  use crate::parser::Parser;
+  use crate::parser::{Error, ErrorCode, Parser};
 
   #[test]
   fn test_parse() {
@@ -314,5 +314,73 @@ mod tests {
       now.format("test%y - %Y-%m-%d_%H-%M-%S").to_string(),
       r.unwrap()
     );
+  }
+
+  #[test]
+  fn test_parse_invalid_1() {
+    let mut p = Parser::new();
+
+    let name = "test\\Q";
+    let r = p.parse(name);
+
+    assert_eq!(
+      Error {
+        column: 5,
+        code: ErrorCode::InvalidCharacter,
+        message: "Invalid character: Q".to_string()
+      },
+      r.unwrap_err()
+    )
+  }
+
+  #[test]
+  fn test_parse_invalid_2() {
+    let mut p = Parser::new();
+
+    let name = "test\\Qtest";
+    let r = p.parse(name);
+
+    assert_eq!(
+      Error {
+        column: 5,
+        code: ErrorCode::InvalidCharacter,
+        message: "Invalid character: Q".to_string()
+      },
+      r.unwrap_err()
+    )
+  }
+
+  #[test]
+  fn test_parse_invalid_3() {
+    let mut p = Parser::new();
+
+    let name = "test\\Q\\W";
+    let r = p.parse(name);
+
+    assert_eq!(
+      Error {
+        column: 5,
+        code: ErrorCode::InvalidCharacter,
+        message: "Invalid character: Q".to_string()
+      },
+      r.unwrap_err()
+    )
+  }
+  
+  #[test]
+  fn test_parse_invalid_4() {
+    let mut p = Parser::new();
+
+    let name = "\\Q";
+    let r = p.parse(name);
+
+    assert_eq!(
+      Error {
+        column: 1,
+        code: ErrorCode::InvalidCharacter,
+        message: "Invalid character: Q".to_string()
+      },
+      r.unwrap_err()
+    )
   }
 }
