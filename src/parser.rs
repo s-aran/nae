@@ -166,7 +166,7 @@ mod tests {
   fn test_parse() {
     let mut p = Parser::new();
 
-    let name = "test";
+    let name = "%test%%";
     let r = p.parse(name);
 
     assert_eq!(String::from(name), r.unwrap());
