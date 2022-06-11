@@ -80,9 +80,24 @@ impl Parser {
             let s = datetime.format("%d").to_string();
             ret.extend(s.chars());
           }
+          'p' => {
+            // am/pm (12-hour clock)
+            let s = datetime.format("%p").to_string();
+            ret.extend(s.chars());
+          }
+          'P' => {
+            // AM/PM (12-hour clock)
+            let s = datetime.format("%P").to_string();
+            ret.extend(s.chars());
+          }
           'H' => {
-            // Hour
+            // Hour (24-hour clock)
             let s = datetime.format("%H").to_string();
+            ret.extend(s.chars());
+          }
+          'I' => {
+            // Hour (12-hour clock)
+            let s = datetime.format("%I").to_string();
             ret.extend(s.chars());
           }
           'M' => {
@@ -263,7 +278,7 @@ mod tests {
   }
 
   #[test]
-  fn test_parse_with_datetime_hour_1() {
+  fn test_parse_with_datetime_24hour_1() {
     let mut p = Parser::new();
 
     let name = "test\\H";
@@ -272,6 +287,42 @@ mod tests {
     let now = Local::now();
 
     assert_eq!(now.format("test%H").to_string(), r.unwrap());
+  }
+
+  #[test]
+  fn test_parse_with_datetime_12hour_1() {
+    let mut p = Parser::new();
+
+    let name = "test\\I";
+    let r = p.parse(name);
+
+    let now = Local::now();
+
+    assert_eq!(now.format("test%I").to_string(), r.unwrap());
+  }
+
+  #[test]
+  fn test_parse_with_datetime_ampm_small_1() {
+    let mut p = Parser::new();
+
+    let name = "test\\p";
+    let r = p.parse(name);
+
+    let now = Local::now();
+
+    assert_eq!(now.format("test%p").to_string(), r.unwrap());
+  }
+
+  #[test]
+  fn test_parse_with_datetime_ampm_large_1() {
+    let mut p = Parser::new();
+
+    let name = "test\\P";
+    let r = p.parse(name);
+
+    let now = Local::now();
+
+    assert_eq!(now.format("test%P").to_string(), r.unwrap());
   }
 
   #[test]
