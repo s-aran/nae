@@ -14,7 +14,7 @@ impl Renamer {
   }
 
   pub fn rename(&mut self, target: &Path, name_pattern: &str) -> std::io::Result<()> {
-    let new_name = self.parser.parse(name_pattern);
+    let new_name = self.parser.parse(name_pattern, None);
     FileSystem::rename(target, name_pattern)
   }
 }

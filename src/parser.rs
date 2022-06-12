@@ -8,6 +8,7 @@ pub struct Parser {
 #[derive(Debug, Eq, PartialEq)]
 pub enum ErrorCode {
   // Ok = 0,
+  NoOptionalData,
   InvalidCharacter,
 }
 
@@ -18,12 +19,16 @@ pub struct Error {
   pub message: String,
 }
 
+pub struct OptionalData {
+  pub file_name: String,
+}
+
 impl Parser {
   pub fn new() -> Self {
     Parser { counter: 0 }
   }
 
-  pub fn parse(&mut self, name: &str) -> Result<String, Error> {
+  pub fn parse(&mut self, name: &str, optinal: Option<&OptionalData>) -> Result<String, Error> {
     let mut question_count = 0;
     let mut backslash_flag = false;
 
@@ -60,6 +65,16 @@ impl Parser {
 
         match c {
           '\\' => ret.push('\\'),
+          '0' => match optinal {
+            Some(opt) => ret.extend(opt.file_name.chars()),
+            None => {
+              return Err(Error {
+                code: ErrorCode::NoOptionalData,
+                column: i,
+                message: "OptionalData not specified".to_string(),
+              });
+            }
+          },
           'Y' => {
             // Year (four digit)
             let s = datetime.format("%Y").to_string();
@@ -160,16 +175,29 @@ impl Parser {
 mod tests {
   use chrono::Local;
 
-  use crate::parser::{Error, ErrorCode, Parser};
+  use crate::parser::{Error, ErrorCode, OptionalData, Parser};
 
   #[test]
   fn test_parse() {
     let mut p = Parser::new();
 
     let name = "%test%%";
-    let r = p.parse(name);
+    let r = p.parse(name, None);
 
     assert_eq!(String::from(name), r.unwrap());
+  }
+
+  #[test]
+  fn test_parse_with_zero_1() {
+    let mut p = Parser::new();
+    let data = OptionalData {
+      file_name: String::from("test.txt"),
+    };
+
+    let name = "test\\0";
+    let r = p.parse(name, Some(&data));
+
+    assert_eq!(String::from("testtest.txt"), r.unwrap());
   }
 
   #[test]
@@ -177,7 +205,7 @@ mod tests {
     let mut p = Parser::new();
 
     let name = "test?";
-    let r = p.parse(name);
+    let r = p.parse(name, None);
 
     assert_eq!(String::from("test1"), r.unwrap());
   }
@@ -187,7 +215,7 @@ mod tests {
     let mut p = Parser::new();
 
     let name = "test???";
-    let r = p.parse(name);
+    let r = p.parse(name, None);
 
     assert_eq!(String::from("test001"), r.unwrap());
   }
@@ -197,7 +225,7 @@ mod tests {
     let mut p = Parser::new();
 
     let name = "test???123";
-    let r = p.parse(name);
+    let r = p.parse(name, None);
 
     assert_eq!(String::from("test001123"), r.unwrap());
   }
@@ -207,7 +235,7 @@ mod tests {
     let mut p = Parser::new();
 
     let name = "???test";
-    let r = p.parse(name);
+    let r = p.parse(name, None);
 
     assert_eq!(String::from("001test"), r.unwrap());
   }
@@ -217,7 +245,7 @@ mod tests {
     let mut p = Parser::new();
 
     let name = "???";
-    let r = p.parse(name);
+    let r = p.parse(name, None);
 
     assert_eq!(String::from("001"), r.unwrap());
   }
@@ -228,12 +256,12 @@ mod tests {
     let name = "???";
 
     {
-      let r = p.parse(name);
+      let r = p.parse(name, None);
       assert_eq!(String::from("001"), r.unwrap());
     }
 
     {
-      let r = p.parse(name);
+      let r = p.parse(name, None);
       assert_eq!(String::from("002"), r.unwrap());
     }
   }
@@ -244,7 +272,7 @@ mod tests {
     let name = "?";
 
     for i in 1..1000 + 1 {
-      let r = p.parse(name);
+      let r = p.parse(name, None);
       assert_eq!(format!("{}", i), r.unwrap());
     }
   }
@@ -254,7 +282,7 @@ mod tests {
     let mut p = Parser::new();
 
     let name = "test\\Y";
-    let r = p.parse(name);
+    let r = p.parse(name, None);
 
     let now = Local::now();
 
@@ -266,7 +294,7 @@ mod tests {
     let mut p = Parser::new();
 
     let name = "test\\y";
-    let r = p.parse(name);
+    let r = p.parse(name, None);
 
     let now = Local::now();
 
@@ -278,7 +306,7 @@ mod tests {
     let mut p = Parser::new();
 
     let name = "test\\m";
-    let r = p.parse(name);
+    let r = p.parse(name, None);
 
     let now = Local::now();
 
@@ -290,7 +318,7 @@ mod tests {
     let mut p = Parser::new();
 
     let name = "test\\b";
-    let r = p.parse(name);
+    let r = p.parse(name, None);
 
     let now = Local::now();
 
@@ -302,7 +330,7 @@ mod tests {
     let mut p = Parser::new();
 
     let name = "test\\B";
-    let r = p.parse(name);
+    let r = p.parse(name, None);
 
     let now = Local::now();
 
@@ -314,7 +342,7 @@ mod tests {
     let mut p = Parser::new();
 
     let name = "test\\d";
-    let r = p.parse(name);
+    let r = p.parse(name, None);
 
     let now = Local::now();
 
@@ -326,7 +354,7 @@ mod tests {
     let mut p = Parser::new();
 
     let name = "test\\a";
-    let r = p.parse(name);
+    let r = p.parse(name, None);
 
     let now = Local::now();
 
@@ -338,7 +366,7 @@ mod tests {
     let mut p = Parser::new();
 
     let name = "test\\A";
-    let r = p.parse(name);
+    let r = p.parse(name, None);
 
     let now = Local::now();
 
@@ -350,7 +378,7 @@ mod tests {
     let mut p = Parser::new();
 
     let name = "test\\H";
-    let r = p.parse(name);
+    let r = p.parse(name, None);
 
     let now = Local::now();
 
@@ -362,7 +390,7 @@ mod tests {
     let mut p = Parser::new();
 
     let name = "test\\I";
-    let r = p.parse(name);
+    let r = p.parse(name, None);
 
     let now = Local::now();
 
@@ -374,7 +402,7 @@ mod tests {
     let mut p = Parser::new();
 
     let name = "test\\p";
-    let r = p.parse(name);
+    let r = p.parse(name, None);
 
     let now = Local::now();
 
@@ -386,7 +414,7 @@ mod tests {
     let mut p = Parser::new();
 
     let name = "test\\P";
-    let r = p.parse(name);
+    let r = p.parse(name, None);
 
     let now = Local::now();
 
@@ -398,7 +426,7 @@ mod tests {
     let mut p = Parser::new();
 
     let name = "test\\Y";
-    let r = p.parse(name);
+    let r = p.parse(name, None);
 
     let now = Local::now();
 
@@ -410,7 +438,7 @@ mod tests {
     let mut p = Parser::new();
 
     let name = "test\\S";
-    let r = p.parse(name);
+    let r = p.parse(name, None);
 
     let now = Local::now();
 
@@ -422,7 +450,7 @@ mod tests {
     let mut p = Parser::new();
 
     let name = "test\\y - \\Y-\\m-\\d_\\H-\\M-\\S";
-    let r = p.parse(name);
+    let r = p.parse(name, None);
 
     let now = Local::now();
 
@@ -437,7 +465,7 @@ mod tests {
     let mut p = Parser::new();
 
     let name = "test\\\\";
-    let r = p.parse(name);
+    let r = p.parse(name, None);
 
     assert_eq!(String::from("test\\"), r.unwrap());
   }
@@ -447,7 +475,7 @@ mod tests {
     let mut p = Parser::new();
 
     let name = "test\\\\test";
-    let r = p.parse(name);
+    let r = p.parse(name, None);
 
     assert_eq!(String::from("test\\test"), r.unwrap());
   }
@@ -457,7 +485,7 @@ mod tests {
     let mut p = Parser::new();
 
     let name = "test\\Q";
-    let r = p.parse(name);
+    let r = p.parse(name, None);
 
     assert_eq!(
       Error {
@@ -474,7 +502,7 @@ mod tests {
     let mut p = Parser::new();
 
     let name = "test\\Qtest";
-    let r = p.parse(name);
+    let r = p.parse(name, None);
 
     assert_eq!(
       Error {
@@ -491,7 +519,7 @@ mod tests {
     let mut p = Parser::new();
 
     let name = "test\\Q\\W";
-    let r = p.parse(name);
+    let r = p.parse(name, None);
 
     assert_eq!(
       Error {
@@ -508,7 +536,7 @@ mod tests {
     let mut p = Parser::new();
 
     let name = "\\Q";
-    let r = p.parse(name);
+    let r = p.parse(name, None);
 
     assert_eq!(
       Error {
