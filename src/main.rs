@@ -1,35 +1,40 @@
-
+use std::{env, process::exit};
 
 use rustop::opts;
-use std::path;
-
-
 
 fn main() {
-    println!("Hello, world!");
+  let a = opts! {
+    auto_shorts false;
+    synopsis "file renamer";
+    help true;
 
-    let mut v = vec!["100", "1", "10", "2", "222", "0", "30"];
-    v.sort();
+    opt version:bool, short: 'V', long:"version", desc: "show version";
+    opt verbose:bool, short: 'v', long:"verbose", desc: "verbose mode";
+    opt dry_run:bool, long: "dry-run", desc: "dry run";
+    param path:String, name: "<path>", desc: "rename path";
+    param name:String, name: "<name>", desc: "renamed name";
+  };
 
-    for i in v.iter() {
-        println!("{}", i);
+  let env_args = env::args().collect::<Vec<String>>();
+  let  ea: Vec<&str> = env_args.iter().map(std::string::String::as_str).collect();
+  let (args, _) = match a.parse_args(ea.into_iter()) {
+    Ok(a) => a,
+    Err(rustop::Error::Help(msg)) => {
+      println!("{}", msg);
+      exit(1);
     }
+    Err(e) => rustop::error_and_exit(&e),
+  };
 
-    let target = path::PathBuf::from("./");
-    // enumFiles(&target);
-}
+  if args.version {
+    println!("nae version {}", env!("CARGO_PKG_VERSION"));
+    exit(0);
+  }
 
-fn enumFiles(target: &path::PathBuf) {
-    let files = target.read_dir().unwrap();
+  if args.verbose {
+    println!("verbose.");
+  }
 
-    for dir_entry in files {
-        let dir_entry = dir_entry.unwrap();
-        let path = dir_entry.path();
-
-        if path.is_dir() {
-            enumFiles(&path);
-        } else {
-            println!("{}", path.to_str().unwrap());
-        }
-    }
+  println!("Hello, world!");
+  println!("{:?} -> {}", args.path, args.name);
 }
