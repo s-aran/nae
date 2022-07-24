@@ -250,22 +250,21 @@ impl FileSystem {
 
   #[cfg(target_os = "linux")]
   pub fn get_id_by_filename(path: &Path) -> Result<String, String> {
-    Ok("todo")
+    Ok("todo".to_string())
+  }
+
+  #[cfg(target_os = "linux")]
+  pub fn get_filename_by_id(id_str: &String, hint_dir: &Path) -> Result<String, String> {
+    Ok("todo".to_string())
   }
 }
 
 #[cfg(test)]
 mod tests {
-
-  use windows_sys::Win32::Foundation::{
-    CloseHandle, GetLastError, HANDLE, INVALID_HANDLE_VALUE, NO_ERROR,
-  };
-  use windows_sys::Win32::Storage::FileSystem::{
-    CreateFileW, FILE_ATTRIBUTE_NORMAL, FILE_GENERIC_READ, FILE_SHARE_READ, OPEN_EXISTING,
-  };
-
-  use crate::filesystem::FileSystem;
-  use std::{fs::File, io::Write, os::windows::prelude::OsStrExt, path::Path};
+  use super::*;
+  use std::fs::File;
+  use std::io::prelude::*;
+  use std::path::{Path, PathBuf};
 
   fn create_file(path: &Path) -> bool {
     let mut file = match File::create(path) {
