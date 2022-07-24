@@ -62,9 +62,8 @@ impl FileSystem {
 
       if recursive && path.is_dir() {
         FileSystem::enum_files(&path, recursive, callback)?;
-        return Ok(());
       } else {
-        println!("{}", path.to_str().unwrap());
+        // println!("{}", path.to_str().unwrap());
         callback(&path);
       }
     }
@@ -250,12 +249,45 @@ impl FileSystem {
 
   #[cfg(target_os = "linux")]
   pub fn get_id_by_filename(path: &Path) -> Result<String, String> {
-    Ok("todo".to_string())
+    use std::fs;
+    use std::os::unix::fs::MetadataExt;
+
+    let meta = fs::metadata(path).unwrap();
+    Ok(format!("{}", meta.ino()).to_string())
   }
 
   #[cfg(target_os = "linux")]
   pub fn get_filename_by_id(id_str: &String, hint_dir: &Path) -> Result<String, String> {
-    Ok("todo".to_string())
+    use std::fs;
+    use std::os::unix::fs::MetadataExt;
+
+    println!("in: {}", hint_dir.display(),);
+    let inode = id_str.parse::<u64>().unwrap_or_default();
+    let mut name = "".to_string();
+
+    let result = FileSystem::enum_files(hint_dir, true, &mut |p: &Path| {
+      let meta = fs::metadata(p).unwrap();
+      if meta.ino() == inode {
+        name = p
+          .file_name()
+          .unwrap_or_default()
+          .to_string_lossy()
+          .to_string();
+      }
+    });
+
+    match result {
+      Ok(_) => println!("OK"),
+      Err(_) => println!("FAIL"),
+    };
+
+    println!("name: {}", name);
+
+    if name.len() > 0 {
+      Ok(name)
+    } else {
+      Err(format!("id: {} not found.", id_str).to_string())
+    }
   }
 }
 
