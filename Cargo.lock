@@ -49,6 +49,7 @@ dependencies = [
  "chrono",
  "regex",
  "rustop",
+ "serde",
  "windows-sys",
 ]
 
@@ -93,6 +94,12 @@ name = "rustop"
 version = "1.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cac77bea4e5c89acb455a2fe072bc19334cb130691af6e1bed4625d3f5396e89"
+
+[[package]]
+name = "serde"
+version = "1.0.140"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fc855a42c7967b7c369eb5860f7164ef1f6f81c20c7cc1141f2a604e18723b03"
 
 [[package]]
 name = "time"
