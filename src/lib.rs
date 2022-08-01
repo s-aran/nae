@@ -4,3 +4,4 @@ pub mod fullwidth;
 pub mod filesystem;
 pub mod renamer;
 pub mod task;
+pub mod plan;
