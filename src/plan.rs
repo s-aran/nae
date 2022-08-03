@@ -174,11 +174,13 @@ mod tests {
     assert!(serialized.starts_with("{\"version\":1,\"platform\":"));
     assert!(serialized.contains("\"src\":\"README.md\""));
     assert!(serialized.contains("\"dest\":\"RENAMED.md\""));
+    assert!(serialized.contains("\"id\":\""));
 
     let p2 = Plan::deserialize(&serialized).unwrap();
     assert_eq!(p2.get_root().version, 1);
     assert_eq!(p2.get_root().plan.len(), 1);
     assert_eq!(p2.get_root().plan.get(0).unwrap().src, "README.md");
     assert_eq!(p2.get_root().plan.get(0).unwrap().dest, "RENAMED.md");
+    assert!(p2.get_root().plan.get(0).unwrap().id.len() > 0);
   }
 }
