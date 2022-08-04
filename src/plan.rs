@@ -1,4 +1,7 @@
-use std::{fmt::Display, path::Path};
+use std::{
+  fs::{self},
+  path::Path,
+};
 
 use serde::{
   self,
@@ -134,7 +137,7 @@ impl Plan {
     &self.root.plan
   }
 
-  pub fn serialize(self) -> Result<String, String> {
+  fn serialize(self) -> Result<String, String> {
     let json = serde_json::to_string(&self.root);
     match json {
       Ok(s) => return Ok(s),
@@ -142,7 +145,7 @@ impl Plan {
     }
   }
 
-  pub fn deserialize(data: &String) -> Result<Plan, String> {
+  fn deserialize(data: &String) -> Result<Plan, String> {
     let res = serde_json::from_str::<PlanRoot>(&data);
     match res {
       Ok(p) => {
@@ -152,6 +155,39 @@ impl Plan {
       }
       Err(e) => return Err(format!("error at line: {}, col: {}", e.line(), e.column())),
     }
+  }
+
+  pub fn to_file(self, path: &Path) -> Result<(), String> {
+    let serialized = self.serialize();
+    if serialized.is_err() {
+      return Err(serialized.unwrap_err());
+    }
+
+    let result = std::fs::write(path, serialized.unwrap());
+    match result {
+      Ok(()) => return Ok(()),
+      Err(e) => return Err(e.to_string()),
+    }
+  }
+
+  pub fn from_file(path: &Path) -> Result<Plan, String> {
+    let metadata = fs::metadata(path);
+
+    if metadata.is_err() {
+      return Err(metadata.unwrap_err().to_string());
+    }
+
+    // allow <= 32,768 Bytes
+    if metadata.unwrap().len() > 32_768 {
+      return Err("Cannot read file larger than 32KiB. ".to_string());
+    }
+
+    let json = fs::read_to_string(path);
+    if json.is_err() {
+      return Err(json.unwrap_err().to_string());
+    }
+
+    Plan::deserialize(&json.unwrap())
   }
 }
 
