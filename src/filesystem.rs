@@ -1,6 +1,5 @@
-use std::fs::File;
 use std::io::{Error, ErrorKind};
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 pub struct FileSystem {}
 
@@ -149,9 +148,8 @@ impl FileSystem {
       Storage::FileSystem::{
         CreateFileW, GetFinalPathNameByHandleW, OpenFileById, FILE_FLAG_BACKUP_SEMANTICS,
         FILE_ID_128, FILE_ID_DESCRIPTOR, FILE_NAME_NORMALIZED, FILE_READ_ATTRIBUTES,
-        FILE_SHARE_READ, OPEN_EXISTING, READ_CONTROL, SYNCHRONIZE,
+        FILE_SHARE_READ, OPEN_EXISTING, READ_CONTROL, SYNCHRONIZE, VOLUME_NAME_DOS,
       },
-      System::WindowsProgramming::VOLUME_NAME_DOS,
     };
 
     let mut wstr: Vec<u16> = hint_dir.as_os_str().encode_wide().collect();

@@ -29,7 +29,7 @@ impl Renamer {
   /// ```
   /// use nae::renamer::Renamer;
   /// use std::path::Path;
-  /// 
+  ///
   /// let mut renamer = Renamer::new();
   /// let path = Path::new("README.md");
   /// let new_name = renamer.rename(&path, "new_name", false).unwrap();
@@ -45,6 +45,7 @@ impl Renamer {
     let optional_data = OptionalData {
       file_name: target.file_name().unwrap().to_str().unwrap().to_string(),
     };
+
     match self.parser.parse(name_pattern, Some(&optional_data)) {
       Ok(name) => {
         let new_name = target.with_file_name(name);
@@ -53,6 +54,7 @@ impl Renamer {
         }
         Ok(new_name.to_str().unwrap().to_string())
       }
+      // parsing error
       Err(e) => {
         println!("{}", e.message);
         Err(Error::new(ErrorKind::InvalidInput, e.message))
