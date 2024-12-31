@@ -11,7 +11,7 @@ rustop = "*"
 chrono = "*"
 serde = { version = "*", features = ["derive"] }
 serde_json = "*"
-clap = { versino = "*", features = ["derive"] }
+clap = { version = "*", features = ["derive"] }
 
 [target.'cfg(windows)'.dependencies.windows-sys]
 version = "*"
