@@ -80,8 +80,8 @@ impl FileSystem {
     use windows_sys::Win32::{
       Foundation::{CloseHandle, GetLastError, HANDLE, INVALID_HANDLE_VALUE},
       Storage::FileSystem::{
-        CreateFileW, FileIdInfo, GetFileInformationByHandleEx, FILE_ATTRIBUTE_NORMAL,
-        FILE_GENERIC_READ, FILE_ID_128, FILE_ID_INFO, FILE_SHARE_READ, OPEN_EXISTING,
+        CreateFileW, FILE_ATTRIBUTE_NORMAL, FILE_GENERIC_READ, FILE_ID_128, FILE_ID_INFO,
+        FILE_SHARE_READ, FileIdInfo, GetFileInformationByHandleEx, OPEN_EXISTING,
       },
     };
 
@@ -97,7 +97,7 @@ impl FileSystem {
         std::ptr::null(),
         OPEN_EXISTING,
         FILE_ATTRIBUTE_NORMAL,
-        0,
+        std::ptr::null_mut(),
       )
     };
 
@@ -146,9 +146,9 @@ impl FileSystem {
     use windows_sys::Win32::{
       Foundation::{CloseHandle, GetLastError, HANDLE, INVALID_HANDLE_VALUE, NO_ERROR},
       Storage::FileSystem::{
-        CreateFileW, GetFinalPathNameByHandleW, OpenFileById, FILE_FLAG_BACKUP_SEMANTICS,
-        FILE_ID_128, FILE_ID_DESCRIPTOR, FILE_NAME_NORMALIZED, FILE_READ_ATTRIBUTES,
-        FILE_SHARE_READ, OPEN_EXISTING, READ_CONTROL, SYNCHRONIZE, VOLUME_NAME_DOS,
+        CreateFileW, FILE_FLAG_BACKUP_SEMANTICS, FILE_ID_128, FILE_ID_DESCRIPTOR,
+        FILE_NAME_NORMALIZED, FILE_READ_ATTRIBUTES, FILE_SHARE_READ, GetFinalPathNameByHandleW,
+        OPEN_EXISTING, OpenFileById, READ_CONTROL, SYNCHRONIZE, VOLUME_NAME_DOS,
       },
     };
 
@@ -165,7 +165,7 @@ impl FileSystem {
         std::ptr::null(),
         OPEN_EXISTING,
         FILE_FLAG_BACKUP_SEMANTICS,
-        0,
+        std::ptr::null_mut(),
       )
     };
 
