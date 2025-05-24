@@ -1,5 +1,3 @@
-use std::{borrow::BorrowMut, env};
-
 use clap::{Parser, ValueEnum};
 
 struct Argument {
